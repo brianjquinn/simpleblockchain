@@ -1,5 +1,4 @@
 Brian Quinn - CS645 Network Security @ Drexel University
-Project 3
 
 ### Project Description
 
