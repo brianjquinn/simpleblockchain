@@ -8,7 +8,7 @@ Your last project is to develop a small blockchain system.  You can feel free to
 
 The idea around this blockchain based implementation was to understand the semantics of a maintaining a distributed ledger using some of the blockchain concepts without the intricacies that comes with implementing a blockchain for something like Bitcoin. 
 
-This implementation revolved around setting up peer to peer nodes that could be connected together at any point and sync up the state of this blockchain like data structure, while also simulataneiously trying to "mine" blocks. Mining is vasty simplified and is described later.
+This implementation revolved around setting up peer to peer nodes that could be connected together at any point and sync up the state of this blockchain like data structure, while also simultaneously trying to "mine" blocks. Mining is vastly simplified and is described later.
 
 The center of this implementation is with the blockchainnode.py (BlockchainNode class). The Blockchainnode is implemented in a way so that an initial node can be setup, then subsequent nodes can be spun up to point at already running peers. For example, to setup a peer to peer network in which each node has 2 peers (a triangular formation) you could do the following:
 
@@ -44,7 +44,7 @@ An initial node should be setup without specifying peers via the --peers argumen
 
 A node when started essentially alternates between doing the following 2 things:
 
-1. Trying to accept connections for 5 second intervals and processing the messages that come from those connections in a seperate thread. 
+1. Trying to accept connections for 5 second intervals and processing the messages that come from those connections in a separate thread. 
 2. Maintaining the digital ledger data structure by mining and asking peers for information it needs (such as the latest block or the whole block chain itself)
 
 The data structure representing the distributed ledger or blockchain is essentially a list of Block objects (block.py) where each block has the following fields:
@@ -56,7 +56,7 @@ The data structure representing the distributed ledger or blockchain is essentia
     mined by - the node in this system who "mined" the block
     hash - a SHA-256 hash of index, previous hash, timestamp, data and mined by
 
-That way integrity is maintained because the latest block's hash is dependent on the previous block's hashes (all hashes are SHA-256).
+Integrity is maintained because the latest block's hash is dependent on the previous block's hashes (all hashes are SHA-256).
 
 A new block is "mined" and broadcasted to the other connected nodes in the network who validate the block and add it to their copy of the blockchain by checking the following:
 
@@ -66,24 +66,24 @@ A new block is "mined" and broadcasted to the other connected nodes in the netwo
     newblock.previoushash = latestblock.hash
     newblock.data = the agreed upon "magic number" (explained in Mining later)
 
-Furthermore, every X (default 10) amount of timeouts listening for peers, a node will request the latest block in the blockchain from its peers. If differences are found between its own latest block and received latest blocks, the node will request the entire blockchain from its peers. This is where the longer-chain-wins rules comes into effect.
+Furthermore, every X (default 10) amount of timeouts listening for peer connection and messages, a node will request the latest block in the blockchain from its peers. If differences are found between its own latest block and the received latest block, the node will request the entire blockchain from its peers. This is where the longer-chain-wins rules comes into effect.
 
-If the blockchain it receives is longer than it's own, the received blockchain will replace the node's original copy and the node will continue on. This presents a situation where histories could differ however, the node's history who has done the most cumulative work (ie. you have random genereated the magic number the most times) will eventually be propagated throughout the network.
+If the blockchain it receives is longer than its own, the received blockchain will replace the node's original copy and the node will continue on. This presents a situation where blockchain histories across nodes will differ. This means that the node whose history represents the most cumulative work (ie. the node that has generated the target number the most), will eventually be propagated to all nodes in the network. This is representative of how Bitcoin works, and the reason histories can differ across nodes is because of the rarity in which blocks are added to the blockchain (ie. competition to mine blocks). A sort of self-solving problem if you will.
 
 ### Mining
 
-The process of adding blocks to the blockchain (mining) is vastly oversimplied just to demonstrate the concept that a digital ledger can be maintained across network connected nodes.
+The process of adding blocks to the blockchain (mining) is vastly over-simplified just to demonstrate the concept that a digital ledger can be maintained across network connected nodes.
 
 When a node starts up, before it starts mining, it will request from it's peers the "magic number". The magic number is decided by the first node that is started in the network (ie. a node that is not given any peers via --peers argument), a genesis node if you will.
 
-This magic number is just a random integer between 1 and 10, but it's what drives the "mining" process in this implementation. When a node wants to add a block to the blockchain it must generate a random number. If that random number matches the "magic number", it will create a new block based on the sementatics of the Blockchain data structure and broadcast it to its peers so they can validate it, and add it to their block chain.
+This magic number is just a random integer between 1 and 10, but it's what drives the "mining" process in this implementation. When a node wants to add a block to the blockchain it must generate a random number. If that random number matches the "magic number", it will create a new block based on the semantics of the blockchain data structure and broadcast it to its peers so they can validate and add it to their blockchain.
 
 ### Test Results
 
-The system was tested with 2, 3 and 4 node configurations running on the same machine. I did, also try a 2 node configuration on seperate machines just to test non-localhost host communication on a LAN. Since, a 5 second time was used, studying the logs was the best way to test the implementation. On each 5 second timeout, the node would print out its blockchain length and its full blockchain in human readable form. The way I tested it was I would let 3 nodes run for about 20 minutes and take their last print out of the blockchain. Then I diffed each node's printout of the blockchain and saw they were all the same. This told me that my distributed record keeping activity implementation was successful.
+The system was tested with 2, 3 and 4 node configurations running on the same machine. I did also try a 2 node configuration on separate machines just to test non-localhost host communication on a LAN. Since, a 5 second time was used, studying the logs was the best way to test the implementation. On each 5 second timeout, the node would print out its blockchain length and its full blockchain in human readable form. Testing was conducted by letting 3 nodes run for about 20 minutes. Then I diffed each node's last printout of the blockchain and saw they were all the same. This told me that my distributed record keeping activity implementation was successful.
 
 ### Summary
 
-All-in-all the code in this project implements a distributed record keeping activity with Blockchain semantics. A node essentially listens for connections from known peers and exchanges different message types (defined in blockchainmsg.py) that aid in maintaining N copies of a blockchain like data structure across machines. At the same time a node is attempting to perform a very simple "proof of work" in order to add a record (block) to the chain by generating a random number and hoping it is equal to the agreed upon target value. The data contained in these "mined" blocks is arbritrary (but in this case its the agreed upon target number) since the goal of the implementation was to display a distributed record keeping activity amongst network connected nodes. In this case the record to keep is in the order which network connected nodes generate an agreed upon random number on a continuous basis. The hashing comes into play to ensure validity of ordering in the longest current chain in the network.
+All-in-all the code in this project implements a distributed record keeping activity with blockchain semantics. A node essentially listens for connections from known peers and exchanges different message types (defined in blockchainmsg.py) that aid in maintaining N copies of a blockchain like data structure. At the same time a node is attempting to perform a very simple "proof of work" in order to add a record (block) to the chain by generating a random number and hoping it is equal to the agreed upon target value. The data contained in these "mined" blocks is arbitrary (but in this case its the agreed upon target number) since the goal of the implementation was to display a distributed record keeping activity amongst network connected nodes. In this case the record to keep is the order which network connected nodes generate an agreed upon random number on a continuous basis. The hashing comes into play to ensure validity of ordering in the longest current chain in the network.
 
-The data stored in these blocks could be anything, and the mining function could easily be replaced. What this project provides is a p2p messaging functionality to continuously keep track of a blockchain data structure in a distributed and decentralized manner and to perform some given mining function. The transactions or data that pile up between blocks being mined (and subsequently stored in those blocks) could be made application specific.
+The data stored in these blocks could be anything, and the mining function could easily be replaced. What this project provides is P2P messaging functionality to continuously keep track of a distributed blockchain data structure and to perform some given mining or "proof of work" function. The transactions or data that pile up between blocks being mined could be made application specific.
