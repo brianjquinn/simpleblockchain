@@ -14,21 +14,29 @@ The center of this implementation is with the blockchainnode.py (BlockchainNode 
 
 A<--->B<--->C<--->A
 
-    python blockchainnode.py -d -p 10000
-    python blockchainnode.py -d -p 10001 --peers localhost:10000
-    python blockchainnode.py -d -p 10002 --peers localhost:10000 localhost:10001
+```
+python blockchainnode.py -d -p 10000
+python blockchainnode.py -d -p 10001 --peers localhost:10000
+python blockchainnode.py -d -p 10002 --peers localhost:10000 localhost:10001
+```
 
 or a configuration like so: A<-->B<-->C would be accomplished like this:
 
-    python blockchainnode.py -d -p 10000
-    python blockchainnode.py -d -p 10001 --peers localhost:10000
-    python blockchainnode.py -d -p 10002 --peers localhost:10001
+```
+python blockchainnode.py -d -p 10000
+python blockchainnode.py -d -p 10001 --peers localhost:10000
+python blockchainnode.py -d -p 10002 --peers localhost:10001
+```
 
--d enableds DEBUG level logging, default level is INFO
+-d enables DEBUG level logging, default level is INFO
 
 The -p option specifies the port on the current machine that the node will be listening for connections/messages on.
 
-    python blockchainnode.py -h will show the command line options
+To show command line options:
+
+```
+python blockchainnode.py -h 
+```
 
 An initial node should be setup without specifying peers via the --peers argument. Further nodes need to specify their peers via the --peers argument where each peer is defined by ip:port and separated by a space. If a given node cannot connect to peers specified by the command line the user will be notified and the node will not start.
 
@@ -36,8 +44,8 @@ An initial node should be setup without specifying peers via the --peers argumen
 
 A node when started essentially alternates between doing the following 2 things:
 
-    1. Trying to accept connections for 5 second intervals and processing the messages that come from those connections in a seperate thread. 
-    2. Maintaining the digital ledger data structure by mining and asking peers for information it needs (such as the latest block or the whole block chain itself)
+1. Trying to accept connections for 5 second intervals and processing the messages that come from those connections in a seperate thread. 
+2. Maintaining the digital ledger data structure by mining and asking peers for information it needs (such as the latest block or the whole block chain itself)
 
 The data structure representing the distributed ledger or blockchain is essentially a list of Block objects (block.py) where each block has the following fields:
 
